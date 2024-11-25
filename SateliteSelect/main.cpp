@@ -1,58 +1,57 @@
 #include<iostream>
-#include"SGP4.h"
-
 #include <fstream>
 #include <cstring>
+#include "Sgpsdp.h"
+#include <ctime>
+#include<chrono>
 
-using namespace SGP4Funcs;
+#pragma warning(disable : 4996)
 
-const int MAX_TLE_LINES = 100; // Максимальное количество TLE записей
-const int MAX_LINE_LENGTH = 130; // Максимальная длина строки TLE
-
-void readTLEFile(const std::string& filename, char longstr1[MAX_TLE_LINES * MAX_LINE_LENGTH], char longstr2[MAX_TLE_LINES * MAX_LINE_LENGTH], int& count) {
+void readFileAndCallFunction(const char* filename, CSGP4_SDP4 *test) {
     std::ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Ошибка открытия файла: " << filename << std::endl;
+        std::cerr << "Ошибка при открытии файла!" << std::endl;
         return;
     }
 
-    count = 0;
-    while (count < MAX_TLE_LINES) {
-        // Читаем первую строку TLE
-        if (file.getline(&longstr1[count * MAX_LINE_LENGTH], MAX_LINE_LENGTH)) {
-            // Читаем вторую строку TLE
-            if (!file.getline(&longstr2[count * MAX_LINE_LENGTH], MAX_LINE_LENGTH)) {
-                std::cerr << "Недостаточно строк в файле для последней записи." << std::endl;
-                break;
-            }
-            count++;
-        }
-        else {
-            break;
-        }
-    }
-
+    char m_cLine0[256];
+    char m_cLine1[256];
+    char m_cLine2[256];
+    
+    // Чтение строк из файла
+    file.getline(m_cLine0, sizeof(m_cLine0));
+    file.getline(m_cLine1, sizeof(m_cLine1));
+    file.getline(m_cLine2, sizeof(m_cLine2));
+    // Закрытие файла
     file.close();
+
+    // Создание объекта класса
+    *test = CSGP4_SDP4(m_cLine0, m_cLine1, m_cLine2);
 }
 
 int main() {
-    // Устанавливаем русскую локаль
-    setlocale(LC_ALL, "Russian");
+    // чтение файла TLE состоящего из 3-ч строк
+    const char* filename = "TLE.txt"; //
+    CSGP4_SDP4 test;
+    readFileAndCallFunction(filename, &test);
+    
+    // определение текущего времени для расчета модели 
+    SYSTEMTIME t2;
+    GetSystemTime(&t2);
+    std::cout << t2.wMonth << ' ' << t2.wDay << ' ' << t2.wHour << ' ' << t2.wMinute << ' ' << t2.wSecond << std::endl;
+    double time = test.JulianDate(t2);
 
-    char longstr1[MAX_TLE_LINES * MAX_LINE_LENGTH];
-    char longstr2[MAX_TLE_LINES * MAX_LINE_LENGTH];
-    int count = 0;
+    //Запуск модели
+    test.SGP(time);
 
-    readTLEFile("TLE.txt", longstr1, longstr2, count);
+    //Получение вектора скоростей модели
+    VECTOR possition = test.GetVel();
+    std::cout << possition.x << ' ' << possition.y << ' ' << possition.z << ' ' << possition.w << std::endl;
 
-    // Вывод прочитанных TLE данных
-    std::cout << "Прочитанные TLE данные:\n" << std::endl;
-    for (int i = 0; i < count; ++i) {
-        std::cout << "TLE " << i + 1 << ":\n";
-        std::cout << "Первая строка: " << &longstr1[i * MAX_LINE_LENGTH] << "\n";
-        std::cout << "Вторая строка: " << &longstr2[i * MAX_LINE_LENGTH] << "\n" << std::endl;
-    }
-    gravconsttype prototype;
-    twoline2rv(longstr1, longstr2, 'm', 'm', 'a', prototype, );
+    // Расчет и получение широты, долготы и высоты
+    test.CalculateLatLonAlt(time);
+    std::cout << test.GetLat() << ' ' << test.GetLon() << ' ' << test.GetAlt() << std::endl;
+
+    return 0;
 }
