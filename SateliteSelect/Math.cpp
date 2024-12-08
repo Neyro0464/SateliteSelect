@@ -57,7 +57,7 @@ double CSGP4_SDP4::AcTan(double sinx, double cosx)
 // 360( in the FORTRAN version, but goes from -90( to 270( in the
 // Pascal version. It may have been that this change was made so that
 // AcTan could be used when determining latitude, and because some
-// test cases may have shown absolutely no effect from the change.
+// SatteliteModel1 cases may have shown absolutely no effect from the change.
 // Indeed, sgp4 results appear to not be affected at all by this
 // change. And some sdp4 cases are also not affected (probably because
 // the calls to AcTan were not in the fourth quadrant, which is the

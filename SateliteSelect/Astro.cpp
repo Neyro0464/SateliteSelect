@@ -126,7 +126,7 @@ VECTOR CSGP4_SDP4::CalculateLatLonAlt(VECTOR vPOS, double time)
 //	sun is location of sun
 //	moon is location of moon
 //     Outputs
-//	which points to  message about result of the test
+//	which points to  message about result of the SatteliteModel1
 //	em is zero if not eclipsed by moon
 //	ee is zero if not eclipsed by earth
 //     Returns 0 if no eclipse.

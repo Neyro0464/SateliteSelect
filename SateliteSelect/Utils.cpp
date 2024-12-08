@@ -92,12 +92,18 @@ VECTOR CSGP4_SDP4::GetVel() {return m_vVEL;}
 double CSGP4_SDP4::GetTime(){return m_fTime;}
 double CSGP4_SDP4::GetLat() 
 {
-	if (m_bLatLonAlt)return m_vLLA.x;
+	if ((m_bLatLonAlt) && (m_vLLA.x < 180))
+		return m_vLLA.x;
+	else if ((m_bLatLonAlt) && (m_vLLA.x > 180))
+		return m_vLLA.x - 360;
 	else return NULL;
 }
 double CSGP4_SDP4::GetLon()
 {
-	if (m_bLatLonAlt)return m_vLLA.y;
+	if ((m_bLatLonAlt) && (m_vLLA.y < 180))
+		return m_vLLA.y;
+	else if ((m_bLatLonAlt) && (m_vLLA.y > 180))
+		return m_vLLA.y - 360; 
 	else return NULL;
 }
 double CSGP4_SDP4::GetAlt()
