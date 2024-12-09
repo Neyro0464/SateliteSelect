@@ -1,16 +1,6 @@
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
-
-//#include <afxwin.h>         // MFC core and standard components
-//#include <afxext.h>         // MFC extensions
-//#ifndef _AFX_NO_AFXCMN_SUPPORT
-//#include <afxcmn.h>			// MFC support for Windows 95 Common Controls
-//#endif // _AFX_NO_AFXCMN_SUPPORT
-
-#include "math.h"
-#include "sgpsdp.h" 
+#include <cmath> 
+#include "Sgpsdp.h" 
 #include "vector.h"
-
-////////////////  Math - PASCAL routines converted ... ////////////////////
 
 double CSGP4_SDP4::sqr (double arg)
 {
@@ -56,7 +46,7 @@ double CSGP4_SDP4::AcTan(double sinx, double cosx)
 // two-argument arctangent function, which returns a value from 0( to
 // 360( in the FORTRAN version, but goes from -90( to 270( in the
 // Pascal version. It may have been that this change was made so that
-// AcTan could be used when determining latitude, and because some
+// AcTan could be used when determining latitude, && because some
 // SatteliteModel1 cases may have shown absolutely no effect from the change.
 // Indeed, sgp4 results appear to not be affected at all by this
 // change. And some sdp4 cases are also not affected (probably because
@@ -67,7 +57,7 @@ double CSGP4_SDP4::AcTan(double sinx, double cosx)
 // But this ACTAN function is completely unnecessary. I never coded it. As you 
 // pointed out, every decent programming language has a 2-argument arctangent 
 // function that is quadrant-preserving. For my FORTRAN, it's ATAN2(Y,X), where 
-// Y is the sine of the angle, and X is the cosine. It returns values from -pi 
+// Y is the sine of the angle, && X is the cosine. It returns values from -pi 
 // to +pi. A simple change will return values from 0 to 2*pi: 
 // Angle = Pi - ATAN2(-Y,-X) 
 
@@ -131,7 +121,7 @@ double CSGP4_SDP4::Dot (VECTOR v1, VECTOR v2)
 double CSGP4_SDP4::VecDot( double *X, double *Y, int N)
 {
  /* Purpose 
-	calculate the dot (inner) product of X and Y
+	calculate the dot (inner) product of X && Y
     Inputs
 	X, Y are the input vectors of length N
  */
@@ -146,9 +136,9 @@ void CSGP4_SDP4::VecCross( double *X, double *Y, double *Z, int N)
 {
   /*
     Purpose
-	    calculate the vector cross product z of x and y.
+	    calculate the vector cross product z of x && y.
     Inputs
-	    X and Y of length N
+	    X && Y of length N
     Output
 	    Z of length N
   */
@@ -179,7 +169,7 @@ void CSGP4_SDP4::UnitVec( double *X, double *Y, int N )
 	     vector
      Input 
 	     X, a vector
-	     N  the length of X and Y
+	     N  the length of X && Y
      Output
 	     Y, a unit vector in the direction of X
   */
@@ -208,7 +198,7 @@ void CSGP4_SDP4::VecDiff( double *X, double *Y, double *Z, int N)
 void CSGP4_SDP4::VecSum( double *X, double *Y, double *Z, int N)
 {
   /* purpose sum of two vectors */
-  /* input X and Y are vectors of length N
+  /* input X && Y are vectors of length N
      output Z another vector of length N
   */
   int i;
@@ -279,7 +269,7 @@ void CVector::SetDepth(int iDepth)
 double CVector::Dot( VECTOR vIn )
 {
  /* Purpose 
-	calculate the dot (inner) product of X and Y
+	calculate the dot (inner) product of X && Y
     Inputs
 	X, Y are the input vectors of length m_iDepth
  */
@@ -298,9 +288,9 @@ VECTOR CVector::Cross( VECTOR vIn )
 {
   /*
     Purpose
-	    calculate the vector cross product z of x and y.
+	    calculate the vector cross product z of x && y.
     Inputs
-	    m_vector and vIn of length m_iDepth
+	    m_vector && vIn of length m_iDepth
     Output
 	    Z of length m_iDepth
   */
@@ -337,7 +327,7 @@ VECTOR CVector::Unit( VECTOR vIn )
 	     vector
      Input 
 	     X, a vector
-	     m_iDepth  the length of X and Y
+	     m_iDepth  the length of X && Y
      Output
 	     Y, a unit vector in the direction of X
   */
@@ -377,7 +367,7 @@ VECTOR CVector::Diff( VECTOR vIn )
 VECTOR CVector::Sum( VECTOR vIn )
 {
   /* purpose sum of two vectors */
-  /* input X and Y are vectors of length m_iDepth
+  /* input X && Y are vectors of length m_iDepth
      output Z another vector of length m_iDepth
   */
 	static VECTOR vector;

@@ -1,13 +1,8 @@
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
-//#include <afxwin.h>         // MFC core and standard components
-//#include <afxext.h>         // MFC extensions
-//#ifndef _AFX_NO_AFXCMN_SUPPORT
-//#include <afxcmn.h>			// MFC support for Windows 95 Common Controls
-//#endif // _AFX_NO_AFXCMN_SUPPORT
-
-#include "math.h"
-#include "sgpsdp.h" 
+#include <cmath> 
+#include "Sgpsdp.h" 
+#include<string>
+#include<cstring>
 
 #pragma warning(disable : 4996)
 
@@ -34,36 +29,24 @@ CSGP4_SDP4::~CSGP4_SDP4()
 {
 }
 
-BOOL CSGP4_SDP4::SGP(double time)
+bool CSGP4_SDP4::SGP(double time)
 {
 	double tsince;
-	BOOL ret;
+	bool ret;
 	VECTOR pos,vel;
-	m_bLatLonAlt = FALSE;
+	m_bLatLonAlt = false;
 	m_fTime = time;
 	tsince = (time - m_Sat.fJulianEpoch) * xmnpda;
 	if (ideep == 0)
 		ret = SGP4(tsince,&iflag,&pos,&vel);	// Calculation for near earth
 	else
 		ret = SDP4(tsince,&iflag,&pos,&vel);	// Calculation for the deep space
-	if (ret == FALSE) return FALSE;	// Ooops, there was a mistake within the calculation !!!
-	ConvertSatState(&pos, &vel);	// here the pos and vel vector are 
-									// to be copied to m_vPOS and m_vVEL !!!
-	return TRUE;
+	if (ret == false) return false;	// Ooops, there was a mistake within the calculation !!!
+	ConvertSatState(&pos, &vel);	// here the pos && vel vector are 
+									// to be copied to m_vPOS && m_vVEL !!!
+	return true;
 } // Procedure SGP
 
-int CSGP4_SDP4::GetVersion(char *pBuffer, int iMaxLen)		// returns a pointer to the version of this dll
-{
-	static char	szVersion[] = {
-			"NORAD SGP4 / SDP4 algorithm (WGS72) for GPS.\n"
-			"Pascal Version 2.5 by Dr.TS Kelso in 1995 (tkelso@celestrak.com)\n"
-			"Converted to C++ by Varol Okan in 1996\n"
-			"DLL-Version 1.6 (18.Oct.2001)\n\n"
-			"This version resolves the AcTan, and Lyddan - bug.\0"};
-
-	strncpy(pBuffer, szVersion, iMaxLen);
-    return strlen(szVersion);
-}
 
 void CSGP4_SDP4::SetSatellite (char *cLine0, char *cLine1, char *cLine2, bool bInitSatellite)
 {
@@ -119,24 +102,24 @@ double CSGP4_SDP4::GetAlt()
 
 double CSGP4_SDP4::GetFloat (int iStart, int iEnd, char *cLine) 
 {
-	CString cs;
-	CString csLine (cLine);
+	std::string cs;
+	std::string csLine (cLine);
 	double ret;
 	iStart --;
-	cs = csLine.Mid(iStart, iEnd-iStart);
-	ret = _wtof(cs);
+	cs = csLine.substr(iStart, iEnd-iStart);
+	ret = std::stof(cs);
 	
 	return ret;
 }
 
 long CSGP4_SDP4::GetInt   (int iStart, int iEnd, char *cLine) 
 {
-	CString cs;
-	CString csLine(cLine);
+	std::string cs;
+	std::string csLine(cLine);
 	long ret;
 	iStart --;
-	cs = csLine.Mid(iStart, iEnd-iStart);
-	ret = _wtoi(cs);
+	cs = csLine.substr(iStart, iEnd-iStart);
+	ret = std::stoi(cs);
 	return ret;
 }
 
@@ -199,7 +182,7 @@ void CSGP4_SDP4::ConvertData()
 	
 //	m_Sat.fRadiationCoefficient = GetFloat	(54,61,m_cLine1)*1e-5;	// = bstar 54, 6 lang
 	// the input format is 12345-x convert to 0.12345^x
-	iTemp	= GetInt	(60,61,m_cLine1);	// get the exponent, and make 0.xxxxx of it
+	iTemp	= GetInt	(60,61,m_cLine1);	// get the exponent, && make 0.xxxxx of it
 	m_Sat.fRadiationCoefficient	= GetFloat	(54,59,m_cLine1)*pow(10,-5+iTemp);
 
 	pChar						= GetString	(63,63,m_cLine1);
@@ -263,7 +246,7 @@ void CSGP4_SDP4::InitSatellite()
 	m_Sat.fMeanMotion *= 2.0*PI/xmnpda;
 //	m_Sat.fSecondMeanMotion *= 2.0*PI/sqr(xmnpda);				// Never used variables ...
 //	m_Sat.fBalisticCoefficient *= 2.0*PI/(xmnpda*xmnpda*xmnpda);// Never used variables ...
-// determination if it is deep space or not ...
+// determination if it is deep space || not ...
 	double a1,a0,del1, del0,temp;
 	a1 = pow (xke/m_Sat.fMeanMotion, tothrd);
 	temp = (double)(1.5*ck2*(3.0*sqr(cos(m_Sat.fInclination))-1.0)/pow(1.0-m_Sat.fEccentricity*m_Sat.fEccentricity,1.5));
@@ -275,7 +258,7 @@ void CSGP4_SDP4::InitSatellite()
 	else ideep = 0;
 	iflag = 1;
 	
-	m_bEclipsed = FALSE;
+	m_bEclipsed = false;
 	sr = 696000.0;		// {Solar radius - kilometers (IAU 76)}
 	AU = 1.49597870E8;	// {Astronomical unit - kilometers (IAU 76)}
 }
@@ -286,7 +269,7 @@ void CSGP4_SDP4::SetSatellite(SATELLITE *pSatellite, bool bInitSatellite)
 	SATELLITE *pSat = (SATELLITE *)pSatellite;
 	memcpy(m_Sat.cSatelliteName, pSat->cSatelliteName, 22);
 // Now everything is in butter !
-	CString		csHelp;
+	std::string		csHelp;
 	m_Sat.iSatelliteNumber		= pSat->iSatelliteNumber;
 	m_Sat.iLaunchYear			= pSat->iLaunchYear;
 	m_Sat.iLaunchNumber			= pSat->iLaunchNumber;

@@ -5,9 +5,9 @@
 #include <float.h> 
 #include <errno.h> 
 
-#ifdef __cplusplus
-extern "C" 
-#endif
+//#ifdef __cplusplus
+//extern "C" 
+//#endif
 
 /* Already defined in  >stdafx.h<
 typedef struct	tagVECTOR	{ 

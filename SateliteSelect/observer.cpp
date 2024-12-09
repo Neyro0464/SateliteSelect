@@ -1,17 +1,9 @@
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
-//#include <afxwin.h>         // MFC core and standard components
-//#include <afxext.h>         // MFC extensions
-//#ifndef _AFX_NO_AFXCMN_SUPPORT
-//#include <afxcmn.h>			// MFC support for Windows 95 Common Controls
-//#endif // _AFX_NO_AFXCMN_SUPPORT
-
-#include "math.h"
-#include "sgpsdp.h" 
-
+#include <cmath> 
+#include "Sgpsdp.h" 
 #include <iostream>
 
-// Calculates the User pos and vel, and return m_vUPos and m_vUVel
+// Calculates the User pos && vel, && return m_vUPos && m_vUVel
 void CSGP4_SDP4::CalculateUserPosVel(VECTOR *geodetic, double time)
 {
 //Procedure Calculate_User_PosVel(var geodetic : vector;
@@ -37,13 +29,13 @@ void CSGP4_SDP4::CalculateUserPosVel(VECTOR *geodetic, double time)
 	m_vUVel.z =  0.0;
 	m_vUVel.w = sqrt(sqr(m_vUVel.x) + sqr(m_vUVel.y));
 }
-// Calculates the Observer data for a given Satellite and returns m_vObs
-BOOL CSGP4_SDP4::CalculateObs(VECTOR pos, VECTOR vel, VECTOR geodetic, double time)
+// Calculates the Observer data for a given Satellite && returns m_vObs
+bool CSGP4_SDP4::CalculateObs(VECTOR pos, VECTOR vel, VECTOR geodetic, double time)
 {
 // Procedure Calculate_Obs(pos,vel,geodetic : vector;
 //                                    time : double;
 //                             var obs_set : vector);
-	BOOL	visible;
+	bool	visible;
 	double	lat,lon,alt,theta,sin_lat,cos_lat,sin_theta,cos_theta;
 	double	el,azim,top_s,top_e,top_z;
 	VECTOR	range,rgvel;
@@ -92,14 +84,14 @@ BOOL CSGP4_SDP4::CalculateObs(VECTOR pos, VECTOR vel, VECTOR geodetic, double ti
 	else
 		fTan =  0.0;
 	m_vObs.y += DegToRad((1.02/tan(DegToRad(RadToDeg(el)+10.3/fEle))+fTan)/60.0);
-	if (m_vObs.y >= 0)	visible = TRUE;
+	if (m_vObs.y >= 0)	visible = true;
 	else	{
 		m_vObs.y = el;	//{Reset to true elevation}
-		visible = FALSE;
+		visible = false;
 	}
 	return visible;
 }
-// Calculates the Observer data in topocentric data and return m_vRad
+// Calculates the Observer data in topocentric data && return m_vRad
 void CSGP4_SDP4::CalculateRADec(VECTOR pos, VECTOR vel, VECTOR geodetic, double time)
 {
 //Procedure Calculate_RADec(pos,vel,geodetic : vector;
@@ -109,7 +101,7 @@ void CSGP4_SDP4::CalculateRADec(VECTOR pos, VECTOR vel, VECTOR geodetic, double 
 	double	phi,theta,sin_theta,cos_theta,sin_phi,cos_phi,az,el,Lxh,Lyh,Lzh;
 	double	Sx,Ex,Zx,Sy,Ey,Zy,Sz,Ez,Zz,Lx,Ly,Lz,cos_delta,sin_alpha,cos_alpha;
 	m_vRad.x = 0.0; m_vRad.y = 0.0; m_vRad.z = 0.0; m_vRad.w = 0.0;
-	BOOL visible = CalculateObs(pos,vel,geodetic,time);	//,obs_set);
+	bool visible = CalculateObs(pos,vel,geodetic,time);	//,obs_set);
 	if (visible)	{
 		az = m_vObs.x;
 		el = m_vObs.y;

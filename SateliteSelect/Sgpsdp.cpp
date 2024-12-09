@@ -1,25 +1,10 @@
-//#include "stdafx.h"
-//#include "windows.h"
-//#include "stdio.h"
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
-//#include <afxwin.h>         // MFC core and standard components
-//#include <afxext.h>         // MFC extensions
-//#ifndef _AFX_NO_AFXCMN_SUPPORT
-//#include <afxcmn.h>			// MFC support for Windows 95 Common Controls
-//#endif // _AFX_NO_AFXCMN_SUPPORT
-
-#include <windows.h>
 #include <stdio.h>
-
-#include "math.h"
-#include "sgpsdp.h" 
-
-#define and &&
-#define or ||
+#include <cmath> 
+#include "Sgpsdp.h" 
 
 /////////////////////////////////////////////////////////////////////////////////////
-BOOL CSGP4_SDP4::SGP4(double tsince,int *iFlag, VECTOR *pos, VECTOR *vel)
+bool CSGP4_SDP4::SGP4(double tsince,int *iFlag, VECTOR *pos, VECTOR *vel)
 {
 //  label
 //    9,10,90,100,110,130,140;
@@ -54,7 +39,7 @@ BOOL CSGP4_SDP4::SGP4(double tsince,int *iFlag, VECTOR *pos, VECTOR *vel)
     double tcube,delm,delomg,templ,tempe,tempa,xnode,tsq,xmp;
     double omega,xnoddf,omgadf,xmdf,x,y,z,xdot,ydot,zdot;
 	double ee;
-// Recover original mean motion (xnodp) and semimajor axis (aodp) 
+// Recover original mean motion (xnodp) && semimajor axis (aodp) 
 // from input elements. 
 	int iflag = *iFlag;
   if (iflag == 0)
@@ -72,14 +57,14 @@ BOOL CSGP4_SDP4::SGP4(double tsince,int *iFlag, VECTOR *pos, VECTOR *vel)
   xnodp = m_Sat.fMeanMotion/(1.0 + delo);
   aodp = ao/(1.0 - delo);
 // Initialization 
-// For perigee less than 220 kilometers, the isimp flag is set and
-//  the equations are truncated to linear variation in sqrt a and
+// For perigee less than 220 kilometers, the isimp flag is set &&
+//  the equations are truncated to linear variation in sqrt a &&
 //  quadratic variation in mean anomaly.  Also, the c3 term, the
-//  delta omega term, and the delta m term are dropped.
+//  delta omega term, && the delta m term are dropped.
   isimp = 0;
   if ((aodp*(1.0 - m_Sat.fEccentricity)/ae) < (220.0/xkmper + ae))
     isimp = 1;
-// For perigee below 156 km, the values of s and qoms2t are altered. 
+// For perigee below 156 km, the values of s && qoms2t are altered. 
   s4 = s;
   qoms24 = qoms2t;
   perige = xkmper*(aodp*(1.0 - m_Sat.fEccentricity) - ae);
@@ -146,7 +131,7 @@ SGP10:
   t5cof = 0.2*(3.0*d4 + 12.0*c1*d3 + 6.0*d2*d2 + 15.0*c1sq*(2.0*d2 + c1sq));
 SGP90:
   iflag = 0;
-// Update for secular gravity and atmospheric drag. 
+// Update for secular gravity && atmospheric drag. 
 SGP100:
   xmdf = m_Sat.fMeanAnomaly + xmdot*tsince;
   omgadf = m_Sat.fPeregee + omgdot*tsince;
@@ -174,7 +159,7 @@ SGP110:
   a = aodp*sqr(tempa);
   e = m_Sat.fEccentricity - tempe;
   ee = e*e;
-  if ( ee > 1.0) return FALSE;	// error, no good satellite datas ...
+  if ( ee > 1.0) return false;	// error, no good satellite datas ...
   xl = xmp + omega + xnode + xnodp*templ;
   beta = sqrt(1.0 - ee);
   xn = xke/pow(a,1.5);
@@ -246,7 +231,7 @@ SGP140:
   vx = xmx*cosuk - cosnok*sinuk;
   vy = xmy*cosuk - sinnok*sinuk;
   vz = sinik*cosuk;
-// Position and velocity 
+// Position && velocity 
   x = rk*ux;  pos->x = x;
   y = rk*uy;  pos->y = y;
   z = rk*uz;  pos->z = z;
@@ -255,10 +240,10 @@ SGP140:
   xdot = rdotk*ux + rfdotk*vx;  vel->x = xdot;
   ydot = rdotk*uy + rfdotk*vy;  vel->y = ydot;
   zdot = rdotk*uz + rfdotk*vz;  vel->z = zdot;
-  return TRUE; 
+  return true; 
 }; //Procedure SGP4
 
-BOOL CSGP4_SDP4::Deep(int ideep)
+bool CSGP4_SDP4::Deep(int ideep)
 {
 //  const
     static double zns    =  1.19459E-5;     static double c1ss   =  2.9864797E-6;   static double zes    =  0.01675;
@@ -463,7 +448,7 @@ DEEP20:		 a1 = zcosg*zcosh + zsing*zcosi*zsinh;
              xh3 = -2.0*s2*(z23 - z21);
              if (ls == 30) goto DEEP30;
              else if (ls == 40) goto DEEP40;
-             else	return TRUE;
+             else	return true;
     // Do lunar terms 
 DEEP30:		 sse = se;
              ssi = si;
@@ -502,12 +487,12 @@ DEEP40:		 sse = sse + se;
     // Geopotential resonance initialization for 12 hour orbits 
              iresfl = 0;
              isynfl = 0;
-             if ((xnq < 0.0052359877) and (xnq > 0.0034906585))
+             if ((xnq < 0.0052359877) && (xnq > 0.0034906585))
                goto DEEP70;
-             if ((xnq < 8.26E-3) or (xnq > 9.24E-3))
-               return TRUE;
+             if ((xnq < 8.26E-3) || (xnq > 9.24E-3))
+               return true;
              if (eq < 0.5)
-               return TRUE;
+               return true;
              iresfl = 1;
              eoc = eq*eqsq;
              g201 = -0.306 - (eq - 0.64)*0.440;
@@ -618,12 +603,12 @@ DEEP80:		 xfact = bfact - xnq;
              xnodes = xnodes  +  PI;
              omgasm = omgasm - PI;
 DEEP90:		 if (iresfl == 0) 
-               return TRUE;
+               return true;
 DEEP100:	 if (atime == 0.0)
                goto DEEP170;
-             if ((t >= 0.0) and (atime < 0.0))
+             if ((t >= 0.0) && (atime < 0.0))
                goto DEEP170;
-             if ((t < 0.0) and (atime >= 0.0))
+             if ((t < 0.0) && (atime >= 0.0))
                goto DEEP170;
 //DEEP105:	 Unused ...
 			 if (fabs(t) >= fabs(atime))
@@ -650,7 +635,7 @@ DEEP140:	 xn = xni + xndot*ft + xnddt*ft*ft*0.5;
              xll = xl - omgasm + temp;
              if (isynfl == 0)
                xll = xl + temp + temp;
-             return TRUE;
+             return true;
     // Dot terms calculated 
 DEEP150:	 if (isynfl == 0)
                goto DEEP152;
@@ -687,7 +672,7 @@ DEEP154:	 xldot = xni + xfact;
              xnddt = xnddt*xldot;
                if (iretn == 140) goto DEEP140;
                else if (iretn == 165) goto DEEP165;
-			   else return TRUE;
+			   else return true;
 //             } //case
     // Integrator 
 DEEP160:	 iretn = 165; //assign 165 to iretn
@@ -697,7 +682,7 @@ DEEP165:	 xli = xli + xldot*delt + xndot*step2;
              atime = atime + delt;
              if(iret == 100) goto DEEP100;
              else if(iret == 125) goto DEEP125;
-             else return TRUE;
+             else return true;
 //             }; //case
     // Epoch restart 
 DEEP170:	 if (t >= 0)
@@ -771,7 +756,7 @@ DEEP220:	 sinok = sin(xnodes);
              omgasm = xls - xll - cos(xinc)*xnodes;
 DEEP230: ;	 }; //dpper
 //    } //case
- return TRUE;
+ return true;
 }; //Procedure Deep
 
 void CSGP4_SDP4::Call_dpinit(double *eosq,double *sinio,double *cosio,double *betao,double *aodp,
@@ -809,7 +794,7 @@ void CSGP4_SDP4::Call_dpper(double *e,double *xincc,double *omgadf,double *xnode
   *xmam   = xll;
 }; //Procedure Call_dpper
 
-BOOL CSGP4_SDP4::SDP4(double tsince, int *iFlag, VECTOR *pos, VECTOR *vel)
+bool CSGP4_SDP4::SDP4(double tsince, int *iFlag, VECTOR *pos, VECTOR *vel)
 {
 //  label
 //    9,10,90,100,130,140;
@@ -842,7 +827,7 @@ BOOL CSGP4_SDP4::SDP4(double tsince, int *iFlag, VECTOR *pos, VECTOR *vel)
 	int iflag = *iFlag;
   if (iflag == 0)
     goto SDP100;
-// Recover original mean motion (xnodp) and semimajor axis (aodp) 
+// Recover original mean motion (xnodp) && semimajor axis (aodp) 
 // from input elements. 
   a1 = pow(xke/m_Sat.fMeanMotion,tothrd);
   cosio = cos(m_Sat.fInclination);
@@ -857,7 +842,7 @@ BOOL CSGP4_SDP4::SDP4(double tsince, int *iFlag, VECTOR *pos, VECTOR *vel)
   xnodp = m_Sat.fMeanMotion/(1.0 + delo);
   aodp = ao/(1.0 - delo);
 // Initialization 
-// For perigee below 156 km, the values of s and qoms2t are altered. 
+// For perigee below 156 km, the values of s && qoms2t are altered. 
   s4 = s;
   qoms24 = qoms2t;
   perige = (double)(aodp*(1.0 - m_Sat.fEccentricity) - ae)*xkmper;
@@ -910,7 +895,7 @@ SDP10:
   iflag = 0;
   Call_dpinit(&eosq,&sinio,&cosio,&betao,&aodp,&theta2,&sing,&cosg,
               &betao2,&xmdot,&omgdot,&xnodot,&xnodp);
-// Update for secular gravity and atmospheric drag 
+// Update for secular gravity && atmospheric drag 
 SDP100:
   xmdf = m_Sat.fMeanAnomaly + xmdot*tsince;
   omgadf = m_Sat.fPeregee + omgdot*tsince;
@@ -925,7 +910,7 @@ SDP100:
   a = pow(xke/xn,tothrd)*sqr(tempa);
   e = em - tempe;
   ee = e*e;
-  if ( ee > 1.0) return FALSE;	// wrong satellite datas
+  if ( ee > 1.0) return false;	// wrong satellite datas
   xmam = xmdf + xnodp*templ;
   Call_dpper(&e,&xinc,&omgadf,&xnode,&xmam);
   xl = xmam + omgadf + xnode;
@@ -998,14 +983,14 @@ SDP140:
   vx = xmx*cosuk - cosnok*sinuk;
   vy = xmy*cosuk - sinnok*sinuk;
   vz = sinik*cosuk;
-// Position and velocity 
+// Position && velocity 
   x = rk*ux;  pos->x = x;
   y = rk*uy;  pos->y = y;
   z = rk*uz;  pos->z = z;
   xdot = rdotk*ux + rfdotk*vx;  vel->x = xdot;
   ydot = rdotk*uy + rfdotk*vy;  vel->y = ydot;
   zdot = rdotk*uz + rfdotk*vz;  vel->z = zdot;
-  return TRUE;
+  return true;
 };	//Procedure SDP4
 
 
