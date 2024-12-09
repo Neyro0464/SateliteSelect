@@ -82,6 +82,11 @@ void *CSGP4_SDP4::GetSatellite()		// returns a pointer to th actual satellite
 	return (void *) &m_Sat;
 }
 
+int CSGP4_SDP4::GetNORAD()
+{
+	return m_Sat.iSatelliteNumber;
+}
+
 VECTOR	CSGP4_SDP4::GetUserPos(void)	{return m_vUPos;}
 VECTOR	CSGP4_SDP4::GetUserVel(void)	{return m_vUVel;}
 VECTOR	CSGP4_SDP4::GetObserver(void)	{return m_vObs;}
