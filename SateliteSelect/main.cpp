@@ -242,6 +242,6 @@ int main() {
     for (const auto& item : Objects) {
         std::cout << "# " << item.SatteliteNumber << " \t\t| " << item.velocity << "\t | \t\t" << item.time.tm_mday << "/" << item.time.tm_mon + 1 << "/" << item.time.tm_year + 1900 << "\t" << item.time.tm_hour << ":" << item.time.tm_min << ":" << item.time.tm_sec << " " << std::endl;
     }
-    system("pause");
+    //system("pause");
     return 0;
 }
