@@ -11,9 +11,9 @@
 using namespace std;
 using namespace std::chrono;
 
-const int N = 1000;
+const int N = 600;
 
-struct LLAPos // Структура содержащая геопозицию
+struct LLAPos // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
     double Lat = 0, Lon = 0, Alt = 0;
 };
@@ -26,35 +26,35 @@ struct Sattelite
     double timeStamp;
 };
 
-// Чтение TLE файла
+// пїЅпїЅпїЅпїЅпїЅпїЅ TLE пїЅпїЅпїЅпїЅпїЅ
 bool readFileAndCallFunction(const char* filename, CSGP4_SDP4* SatteliteModel, std::streampos* here, int i) {
     std::ifstream file(filename);
 
     if (!file.is_open()) {
         std::cerr << "ERRO: File is not open " << std::endl;
-        return false; // Возвращаем false, если файл не удалось открыть
+        return false; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ false, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     }
 
     char m_cLine0[70];
     char m_cLine1[70];
     char m_cLine2[70];
     file.seekg(*here);
-    // Чтение строк из файла
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     if (file.getline(m_cLine0, sizeof(m_cLine0)) &&
         file.getline(m_cLine1, sizeof(m_cLine1)) &&
         file.getline(m_cLine2, sizeof(m_cLine2))) {
-        // Создание объекта класса
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         SatteliteModel[i] = CSGP4_SDP4(m_cLine0, m_cLine1, m_cLine2);
         *here = file.tellg();
         file.close();
-        return true; // Возвращаем true, если данные успешно считаны
+        return true; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ true, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     }
 
     file.close();
-    return false; // Возвращаем false, если не удалось считать данные
+    return false; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ false, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
-// Определение геопозиции станции
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 bool defStationPos(LLAPos* station) {
     std::cout << "Enter the coordinates (latitude longitude altitude) of the station:";
     double Lat = 0.0, Lon = 0.0, Alt = 0.0;
@@ -77,7 +77,7 @@ VECTOR ConvertLLAtoCoordinate(LLAPos* Object) {
 }
 
 VECTOR SattelitePos(CSGP4_SDP4 SGP, LLAPos* SatteliteLLA_1, VECTOR Sattelite_1, double time) {
-    // Расчет и получение широты, долготы и высоты Спутника
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     SGP.CalculateLatLonAlt(time);
     SatteliteLLA_1->Lat = SGP.GetLat();
     SatteliteLLA_1->Lon = SGP.GetLon();
@@ -86,7 +86,7 @@ VECTOR SattelitePos(CSGP4_SDP4 SGP, LLAPos* SatteliteLLA_1, VECTOR Sattelite_1, 
     SatteliteLLA_1->Lat = SGP.DegToRad(SatteliteLLA_1->Lat);
     SatteliteLLA_1->Lon = SGP.DegToRad(SatteliteLLA_1->Lon);
 
-    // Создание вектора с декартовыми координатами спутника
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     Sattelite_1 = ConvertLLAtoCoordinate(SatteliteLLA_1);
     return Sattelite_1;
 }
@@ -109,7 +109,7 @@ VECTOR Transferring(VECTOR object, LLAPos Station) {
     return { x0, y0, z0 };
 }
 
-// Проверка вхождения спутника в область видимости станции связи
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 bool IntersectCheck(LLAPos StationLLA_1, VECTOR Sattelite_1) {
     double x = Sattelite_1.x;
     double y = Sattelite_1.y;
@@ -124,7 +124,7 @@ bool IntersectCheck(LLAPos StationLLA_1, VECTOR Sattelite_1) {
     if (prepare <= R)
         return false;
 
-    double koef = tan(PI / 18.0); // от 10 до 90 градусов (10-170)
+    double koef = tan(PI / 18.0); // пїЅпїЅ 10 пїЅпїЅ 90 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (10-170)
     double intersection = pow(z * cos(beta) - sin(beta) * (y * sin(alpha) + x * cos(alpha)), 2) + pow(y * cos(alpha) - x * sin(alpha), 2) - pow(z * sin(beta) + cos(beta) * (y * sin(alpha) + x * cos(alpha)) - R, 2) / koef;
 
     if (intersection < 0)
@@ -141,7 +141,7 @@ void VelocityCheck(const char* filename, LLAPos Station, CSGP4_SDP4* SatteliteMo
 
     auto now = system_clock::now();
     auto now_time_t = system_clock::to_time_t(now);
-    auto now_tm = *gmtime(&now_time_t); // Используем gmtime для получения времени в UTC
+    auto now_tm = *gmtime(&now_time_t); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ gmtime пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ UTC
 
     tm Time2 = now_tm;
     Time2.tm_min += 1;
@@ -174,16 +174,16 @@ void VelocityCheck(const char* filename, LLAPos Station, CSGP4_SDP4* SatteliteMo
 double TimeIntersect(CSGP4_SDP4 SatteliteModel, LLAPos StationLLA_1) {
     auto now = system_clock::now();
     auto now_time_t = system_clock::to_time_t(now);
-    auto now_tm = *gmtime(&now_time_t); // Используем gmtime для получения времени в UTC
+    auto now_tm = *gmtime(&now_time_t); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ gmtime пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ UTC
 
     tm temp = now_tm;
     tm Time2 = now_tm;
     Time2.tm_min += 30;
     temp.tm_sec += 30;
 
-    double time = SatteliteModel.JulianDate(now_tm); // нижняя граница
-    double tempTime = SatteliteModel.JulianDate(temp); // Временной промежуток
-    double time2 = SatteliteModel.JulianDate(Time2); // верхняя граница
+    double time = SatteliteModel.JulianDate(now_tm); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    double tempTime = SatteliteModel.JulianDate(temp); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    double time2 = SatteliteModel.JulianDate(Time2); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     LLAPos SatteliteLLA_1;
     VECTOR Sattelite_1 = { 0, 0, 0, 0 };
@@ -206,7 +206,7 @@ double TimeIntersect(CSGP4_SDP4 SatteliteModel, LLAPos StationLLA_1) {
 
 int main() {
     const char* filename = "TLE.txt";
-    CSGP4_SDP4 SatteliteModel[N];
+    CSGP4_SDP4 SatteliteModel[N]; // REMAKE in dinamic storage
     std::vector<Sattelite> Objects;
 
     LLAPos StationLLA_1;
@@ -225,7 +225,7 @@ int main() {
     int test = 0;
     for (int i = 0; i < N; i++) {
         test = SatteliteModel[i].GetNORAD();
-        if (test != 0 && test != 32763) {
+        if (test > 9999 && test != 32763) {
             time = TimeIntersect(SatteliteModel[i], StationLLA_1);
             if (time != 0) {
                 Objects.push_back({ test, SatteliteModel[i].CalendarDate(time), SatteliteModel[i].GetVel().w, time });
