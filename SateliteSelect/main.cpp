@@ -207,6 +207,7 @@ bool VelocityCheck(LLAPos Station, std::vector<CSGP4_SDP4>& SatelliteModel) {
     return (abs(theta2 - theta) >= 1.9);
 }
 
+//Function that save only satellites with suitable speed
 void SatelliteFilter(std::string filename, LLAPos Station, std::vector<CSGP4_SDP4>& SatelliteModel) {
     
     std::streampos here = 0;
@@ -221,48 +222,56 @@ void SatelliteFilter(std::string filename, LLAPos Station, std::vector<CSGP4_SDP
 
 
 
-
+// checks the intersection of the satellite with the station's visibility cone (+30 sec to +30 min)
+//  Filter satellites that would be in cone of visibility for timeMinObserve(sec)
 double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& minAzm, double& maxAzm, double& minElv, double& maxElv, int& timeMinObserveSec) { //remake
     auto now = system_clock::now();
     auto now_time_t = system_clock::to_time_t(now);
     auto now_tm = *gmtime(&now_time_t); // Working in UTC time
 
-    tm temp = now_tm;
-    tm Time2 = now_tm;
-    Time2.tm_sec += timeMinObserveSec;
-    temp.tm_sec += 30;
+    tm lowerTime = now_tm;  // lower bound of time (current time + 30 sec)
+    lowerTime.tm_sec += 30;
 
-    double time = SatelliteModel.JulianDate(now_tm); // lower bound of time interval
-    double tempTime = SatelliteModel.JulianDate(temp); // time cursor that move between lower and upper bounds of time interval
-    double time2 = SatelliteModel.JulianDate(Time2); // upper bound of time interval
+    tm temp = now_tm;       // time that we shift to find required time (current time)
+
+    tm upperTime = now_tm;  // upper bound of time (current time + 30 min)
+    upperTime.tm_min += 30;
+
+
+    double lowerTm = SatelliteModel.JulianDate(lowerTime); // lower bound of time interval
+    double tempTm = SatelliteModel.JulianDate(temp); // time cursor that move between lower and upper bounds of time interval
+    double upperTm = SatelliteModel.JulianDate(upperTime); // upper bound of time interval
 
     LLAPos SatelliteLLA_1;
     VECTOR Satellite_1 = { 0, 0, 0, 0 };
     bool check1 = 0;
 
-    while ((check1 == false || tempTime <= time) && tempTime <= time2) {
-        tempTime = SatelliteModel.JulianDate(temp);
-        SatelliteModel.SGP(tempTime);
-        Satellite_1 = SatellitePos(SatelliteModel, &SatelliteLLA_1, Satellite_1, tempTime);
+    while ((check1 == false || tempTm <= lowerTm) && tempTm <= upperTm) { 
+
+        tempTm = SatelliteModel.JulianDate(temp);
+        SatelliteModel.SGP(tempTm);
+        Satellite_1 = SatellitePos(SatelliteModel, &SatelliteLLA_1, Satellite_1, tempTm);
         check1 = IntersectCheck(StationLLA_1, Satellite_1, minAzm, maxAzm, minElv, maxElv);
         temp.tm_sec += 1;
     }
-    //std::cout << tempTime;
-    if (tempTime > time2 || tempTime < time) {
+
+    if (tempTm > upperTm || tempTm < lowerTm) {
         return 0;
     }
 
-    Time2 = temp;
-    Time2.tm_sec += timeMinObserveSec - 1;
-    double checkTime = SatelliteModel.JulianDate(Time2);
-    Satellite_1 = SatellitePos(SatelliteModel, &SatelliteLLA_1, Satellite_1, tempTime);
+    // block for time filter
+    tm filterTime = temp;
+    filterTime.tm_sec += timeMinObserveSec - 1;
+    double checkTime = SatelliteModel.JulianDate(filterTime);
+    Satellite_1 = SatellitePos(SatelliteModel, &SatelliteLLA_1, Satellite_1, checkTime);
     if (IntersectCheck(StationLLA_1, Satellite_1, minAzm, maxAzm, minElv, maxElv)) {
-        return tempTime;
+        return tempTm;
     }
     else
         return 0;
 }
 
+// Check direction by defining sign of the angle between station and satellite
 bool getDiraction(LLAPos Station, CSGP4_SDP4 SatelliteModel) {
     VECTOR Satellite_1 = { 0, 0, 0, 0 };
     VECTOR Satellite_2 = { 0, 0, 0, 0 };
@@ -298,7 +307,7 @@ bool getDiraction(LLAPos Station, CSGP4_SDP4 SatelliteModel) {
 
 
 int main() {
-    std::string filename = "TLE.txt"; // std::string
+    std::string filename = "TLE.txt";
     std::vector<CSGP4_SDP4> SatelliteModel;
     std::vector<Satellite> Objects;
 
