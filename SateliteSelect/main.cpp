@@ -20,10 +20,15 @@ struct Satellite
 {
     std::string  SatelliteName;
     int SatelliteNumber;
+    double AzmDeg;
+    double ElvDeg;
+    double Lat;
+    double Lon;
+    double Alt;
     tm time;
     double velocity;
-    double timeStamp;
     bool direction;
+    double timeStamp;
 };
 
 // Reading TLE file and make new class objects
@@ -123,7 +128,7 @@ VECTOR Transferring(VECTOR object, LLAPos Station) {
 }
 
 // Checking intersection: if satellite in view area of station
-bool IntersectCheck(LLAPos StationLLA_1, VECTOR Satellite_1, double& minAzm, double& maxAzm, double& minElv, double& maxElv) {
+bool IntersectCheck(LLAPos StationLLA_1, VECTOR Satellite_1, double& minAzm, double& maxAzm, double& minElv, double& maxElv, double& theta, double& fi) {
     double x = Satellite_1.x;
     double y = Satellite_1.y;
     double z = Satellite_1.z;
@@ -148,6 +153,8 @@ bool IntersectCheck(LLAPos StationLLA_1, VECTOR Satellite_1, double& minAzm, dou
     double new_y = y * cos(alpha) - x * sin(alpha);
     double new_z = (z * sin(beta) + cos(beta) * (y * sin(alpha) + x * cos(alpha))) - R;
 
+    fi = atan(new_y / new_x);
+    theta = atan(sqrt(pow(new_x, 2) + pow(new_y, 2)) / new_z);
 
     /* Previous variant with bigger cone of view 
     double prepare = z * sin(beta) + cos(beta) * (y * sin(alpha) + x * cos(alpha));
@@ -165,7 +172,10 @@ bool IntersectCheck(LLAPos StationLLA_1, VECTOR Satellite_1, double& minAzm, dou
         return false;
 
     double equation = 1 / koef_x * pow(-new_z * sin(delta) + cos(delta) * (new_x * cos(gamma) - new_y * sin(gamma)), 2) + 1 / koef_y * pow(new_y * cos(gamma) + new_x * sin(gamma), 2) - pow(new_z * cos(delta) + sin(delta) * (-new_y * sin(gamma) + new_x * cos(gamma)), 2);
-
+/*
+    fi = atan((new_y * cos(gamma) + new_x * sin(gamma) / -new_z * sin(delta) + cos(delta) * (new_x * cos(gamma) - new_y * sin(gamma))));
+    theta = atan((sqrt(pow(-new_z * sin(delta) + cos(delta) * (new_x * cos(gamma) - new_y * sin(gamma)), 2) + pow(new_y * cos(gamma) + new_x * sin(gamma), 2))) / new_z * cos(delta) + sin(delta) * (-new_y * sin(gamma) + new_x * cos(gamma)));
+    */
     if (equation < 0)
         return true;
     else
@@ -224,7 +234,7 @@ void SatelliteFilter(std::string filename, LLAPos Station, std::vector<CSGP4_SDP
 
 // checks the intersection of the satellite with the station's visibility cone (+30 sec to +30 min)
 //  Filter satellites that would be in cone of visibility for timeMinObserve(sec)
-double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& minAzm, double& maxAzm, double& minElv, double& maxElv, int& timeMinObserveSec) { //remake
+double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& minAzm, double& maxAzm, double& minElv, double& maxElv, int& timeMinObserveSec, double &theta, double& fi) { //remake
     auto now = system_clock::now();
     auto now_time_t = system_clock::to_time_t(now);
     auto now_tm = *gmtime(&now_time_t); // Working in UTC time
@@ -251,7 +261,7 @@ double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& min
         tempTm = SatelliteModel.JulianDate(temp);
         SatelliteModel.SGP(tempTm);
         Satellite_1 = SatellitePos(SatelliteModel, &SatelliteLLA_1, Satellite_1, tempTm);
-        check1 = IntersectCheck(StationLLA_1, Satellite_1, minAzm, maxAzm, minElv, maxElv);
+        check1 = IntersectCheck(StationLLA_1, Satellite_1, minAzm, maxAzm, minElv, maxElv, theta, fi);
         temp.tm_sec += 1;
     }
 
@@ -264,7 +274,7 @@ double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& min
     filterTime.tm_sec += timeMinObserveSec - 1;
     double checkTime = SatelliteModel.JulianDate(filterTime);
     Satellite_1 = SatellitePos(SatelliteModel, &SatelliteLLA_1, Satellite_1, checkTime);
-    if (IntersectCheck(StationLLA_1, Satellite_1, minAzm, maxAzm, minElv, maxElv)) {
+    if (IntersectCheck(StationLLA_1, Satellite_1, minAzm, maxAzm, minElv, maxElv, theta, fi)) {
         return tempTm;
     }
     else
@@ -290,8 +300,10 @@ bool getDiraction(LLAPos Station, CSGP4_SDP4 SatelliteModel) {
     SatelliteModel.SGP(time);
     Satellite_1 = SatellitePos(SatelliteModel, &SatelliteLLA, Satellite_1, time);
     Satellite_1 = Transferring(Satellite_1, Station);
+
     double theta = atan(sqrt(pow(Satellite_1.x, 2) + pow(Satellite_1.y, 2)) / Satellite_1.z);
-    theta = SatelliteModel.RadToDeg(theta);
+    theta = SatelliteModel.RadToDeg(theta);/////////////////
+
     SatelliteModel.SGP(time2);
     Satellite_2 = SatellitePos(SatelliteModel, &SatelliteLLA, Satellite_2, time);
     Satellite_2 = Transferring(Satellite_2, Station);
@@ -310,6 +322,7 @@ int main() {
     std::string filename = "TLE.txt";
     std::vector<CSGP4_SDP4> SatelliteModel;
     std::vector<Satellite> Objects;
+    
 
     double minAzm = 0, maxAzm = 0, minElv = 0, maxElv = 0; 
     int timeMinObserveSec = 0;
@@ -331,14 +344,24 @@ int main() {
 
     int N = SatelliteModel.size();
     double time = 0;
-    int test = 0;
+    int satNumer = 0;
     for (int i = 0; i < N; i++) {
-        test = SatelliteModel[i].GetNORAD();
+        satNumer = SatelliteModel[i].GetNORAD();
+        
         SATELLITE* s = (SATELLITE*)SatelliteModel[i].GetSatellite(); 
 
-        time = TimeIntersect(SatelliteModel[i], StationLLA_1, minAzm, maxAzm, minElv, maxElv, timeMinObserveSec);
+        double theta = 0;
+        double fi = 0;
+        time = TimeIntersect(SatelliteModel[i], StationLLA_1, minAzm, maxAzm, minElv, maxElv, timeMinObserveSec, theta, fi);
         if (time != 0) {
-            Objects.push_back({ s->cSatelliteName, test, SatelliteModel[i].CalendarDate(time), SatelliteModel[i].GetVel().w, time, getDiraction(StationLLA_1, SatelliteModel[i]) });
+            bool dir = getDiraction(StationLLA_1, SatelliteModel[i]); 
+            SatelliteModel[i].CalculateLatLonAlt(time);
+            double Lat = SatelliteModel[i].GetLat();
+            double Lon = SatelliteModel[i].GetLon();
+            double Alt = SatelliteModel[i].GetAlt();
+            fi = SatelliteModel[i].RadToDeg(fi);
+            theta = SatelliteModel[i].RadToDeg(theta);
+            Objects.push_back({ s->cSatelliteName, satNumer, fi, theta, Lat, Lon, Alt, SatelliteModel[i].CalendarDate(time), SatelliteModel[i].GetVel().w, dir, time});
         }
 
 
@@ -348,14 +371,14 @@ int main() {
         return a.timeStamp < b.timeStamp;
         });
 
-    std::cout << "# Satellite Name " << " \t | " << "# Satellite Number" << " \t | " << "Velocity km/s\t | " << "Direction\t| " << "DD/MM/YYYY\thh:mm:ss" << std::endl; 
+    std::cout << "# Satellite Name " << " \t | " << "# Satellite Number" << " \t| " << "AZM   |" << "ELV   |" << "Lat   | " << "Lon    |" << "Alt    | " << "Velocity km/s\t | " << "Direction\t| " << "DD/MM/YYYY\thh:mm:ss" << std::endl;
 
     for (const auto& item : Objects) {
         if (item.direction) {
-            std::cout << "# " << item.SatelliteName << " | " << item.SatelliteNumber << " \t\t | " << item.velocity << "\t\t |\t+\t| " << item.time.tm_mday << "/" << item.time.tm_mon + 1 << "/" << item.time.tm_year + 1900 << "\t" << item.time.tm_hour << ":" << item.time.tm_min << ":" << item.time.tm_sec << " " << std::endl;
+            std::cout << "# " << item.SatelliteName << " | " << item.SatelliteNumber << " \t\t| " << item.AzmDeg << "| " << item.ElvDeg << "| " << item.Lat << " |" << item.Lon << " |" << item.Alt << " |" << item.velocity << "\t\t | \t + \t | " << item.time.tm_mday << " / " << item.time.tm_mon + 1 << " / " << item.time.tm_year + 1900 << "\t" << item.time.tm_hour << ":" << item.time.tm_min << " : " << item.time.tm_sec << " " << std::endl;
         }
         else {
-            std::cout << "# " << item.SatelliteName << " | " << item.SatelliteNumber << " \t\t | " << item.velocity << "\t\t |\t-\t| " << item.time.tm_mday << "/" << item.time.tm_mon + 1 << "/" << item.time.tm_year + 1900 << "\t" << item.time.tm_hour << ":" << item.time.tm_min << ":" << item.time.tm_sec << " " << std::endl;
+            std::cout << "# " << item.SatelliteName << " | " << item.SatelliteNumber << " \t\t| " << item.AzmDeg << "| " << item.ElvDeg << "| " << item.Lat << " |" << item.Lon << " |" << item.Alt << " |" << item.velocity << "\t\t | \t - \t | " << item.time.tm_mday << " / " << item.time.tm_mon + 1 << " / " << item.time.tm_year + 1900 << "\t" << item.time.tm_hour << ":" << item.time.tm_min << " : " << item.time.tm_sec << " " << std::endl;
         }
     }
     return 0;
