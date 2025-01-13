@@ -36,4 +36,10 @@ g\left(x,y,z\right)=\left(y\cdot\cos\left(\alpha\right)-x\cdot\sin\left(\alpha\r
 
 h\left(x,y,z\right)=\left(z\sin(\beta)+\cos(\beta)(y\sin(\alpha)+x\cos(\alpha))-10\right)
 
-\left(f\left(x,y,z\right)\cdot\cos\left(v\right)\ -\ \sin\left(v\right)\cdot\left(g\left(x,y,z\right)\cdot\sin\left(c\right)+h\left(x,y,z\right)\cdot\cos\left(c\right)\right)\right)^{2\ \ }+\left(g\left(x,y,z\right)\cdot\cos\left(c\right)-h\left(x,y,z\right)\cdot\sin\left(c\right)\right)^{2}-\left(f\left(x,y,z\right)\sin(v)+\cos(v)(g\left(x,y,z\right)\sin(c)+h\left(x,y,z\right)\cos(c))\right)^{2}=0\left\{10>f\left(x,y,z\right)\sin(v)+\cos(v)(f\left(x,y,z\right)\sin(c)+h\left(x,y,z\right)\cos(c))>\ 0\right\}
+\frac{1}{k_{2}}\left(-h\left(x,y,z\right)\cdot\sin\left(v\right)\ +\ \cos\left(v\right)\cdot\left(f\left(x,y,z\right)\cdot\cos\left(c\right)-g\left(x,y,z\right)\cdot\sin\left(c\right)\right)\right)^{2\ \ }+\frac{1}{k_{1}}\left(g\left(x,y,z\right)\cdot\cos\left(c\right)+f\left(x,y,z\right)\cdot\sin\left(c\right)\right)^{2}-\left(h\left(x,y,z\right)\cos(v)+\sin(v)(-g\left(x,y,z\right)\sin(c)+f\left(x,y,z\right)\cos(c))\right)^{2}<0\left\{5000>\left(h\left(x,y,z\right)\cos(v)+\sin(v)(-g\left(x,y,z\right)\sin(c)+f\left(x,y,z\right)\cos(c))\right)>\ 0\right\}
+
+k_{1}=\tan\left(\frac{\pi}{180}\cdot\frac{\left(q-w\right)}{2}\right)\ 
+
+k_{2}=\tan\left(\frac{\pi}{180}\cdot\frac{\left(u-t\right)}{2}\right)
+
+o=\frac{\pi}{2}-\frac{\left(u+t\right)}{2}\cdot\frac{\pi}{180}
