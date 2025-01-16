@@ -9,9 +9,6 @@
 #include <chrono>
 #pragma warning(disable : 4996)
 
-//Временные библиотеки
-#include <conio.h>
-
 using namespace std;
 using namespace std::chrono;
 
