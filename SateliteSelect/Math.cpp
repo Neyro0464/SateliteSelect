@@ -1,27 +1,26 @@
-#include <cmath> 
 #include "Sgpsdp.h" 
 #include "vector.h"
 
-double CSGP4_SDP4::sqr (double arg)
+double CSGP4_SDP4::sqr(double arg)
 {
-	return arg*arg;
+	return arg * arg;
 }
 
-double CSGP4_SDP4::RadToDeg (double arg)
+double CSGP4_SDP4::RadToDeg(double arg)
 {
-	return (double)(arg/(2.0*PI)*360.0);
+	return (double)(arg / (2.0 * PI) * 360.0);
 }
 
-double CSGP4_SDP4::DegToRad (double arg)
+double CSGP4_SDP4::DegToRad(double arg)
 {
-	return (double)(arg/360.0*(2.0*PI));
+	return (double)(arg / 360.0 * (2.0 * PI));
 }
 
-double CSGP4_SDP4::Fmod2p (double arg)
+double CSGP4_SDP4::Fmod2p(double arg)
 {
 	double modu, ret;
-	double twopi = 2.0*PI;
-	modu = arg - (int)(arg/twopi) * twopi;
+	double twopi = 2.0 * PI;
+	modu = arg - (int)(arg / twopi) * twopi;
 	if (modu >= 0.0)
 		ret = modu;
 	else
@@ -32,7 +31,7 @@ double CSGP4_SDP4::Fmod2p (double arg)
 double CSGP4_SDP4::Modulus(double arg1, double arg2)
 {
 	double modu;
-	modu = arg1 - (long)(arg1/arg2) * arg2;
+	modu = arg1 - (long)(arg1 / arg2) * arg2;
 	if (modu >= 0.0)	return modu;
 	else			return modu + arg2;
 }
@@ -67,178 +66,178 @@ double CSGP4_SDP4::AcTan(double sinx, double cosx)
 // of the return value. 
 	double ret;
 
-	if ( (sinx == 0.0) && (cosx == 0.0) )
+	if ((sinx == 0.0) && (cosx == 0.0))
 		ret = 270.0;
-	else	{
+	else {
 		ret = atan2(sinx, cosx);
-		if (ret <= -PI/2.000000001)	// This will adapt this version with the 'ugly' 
-			ret += 2.0*PI;			// one below. Both functions return exactly the same values
+		if (ret <= -PI / 2.000000001)	// This will adapt this version with the 'ugly' 
+			ret += 2.0 * PI;			// one below. Both functions return exactly the same values
 	}
-// the old version self made ...
-/*
-	if (cosx == 0.0)	{
-		if (sinx > 0.0)
-			ret = PI/2.0;
+	// the old version self made ...
+	/*
+		if (cosx == 0.0)	{
+			if (sinx > 0.0)
+				ret = PI/2.0;
+			else
+				ret = 3.0*PI/2.0;
+		}
+		else if (cosx > 0.0) {
+		// --------- correction to match FORTRAN version ----------}
+	//		if (sinx > 0)						// Add
+				ret = atan(sinx/cosx);
+	//		else								// Add
+	//			ret = 2*PI + atan(sinx/cosx);	// Add
+		// --------------------------------------------------------}
+		}
 		else
-			ret = 3.0*PI/2.0;
-	}
-	else if (cosx > 0.0) {
-	// --------- correction to match FORTRAN version ----------}
-//		if (sinx > 0)						// Add
-			ret = atan(sinx/cosx);
-//		else								// Add
-//			ret = 2*PI + atan(sinx/cosx);	// Add
-	// --------------------------------------------------------}
- 	}
-	else
-		ret = PI + atan(sinx/cosx);
-	}
-*/
+			ret = PI + atan(sinx/cosx);
+		}
+	*/
 	return ret;
 
 }
 
-long CSGP4_SDP4::round (double arg)
+long CSGP4_SDP4::round(double arg)
 {
 	double fFrac, fInt;
 	fFrac = modf(arg, &fInt);
-	if (fFrac >= 0.5) fInt ++;
-	return (long) fInt;
+	if (fFrac >= 0.5) fInt++;
+	return (long)fInt;
 }
 
-void CSGP4_SDP4::Magnitude (VECTOR *pVector)
+void CSGP4_SDP4::Magnitude(VECTOR* pVector)
 {
 	pVector->w = sqrt(sqr(pVector->x) + sqr(pVector->y) + sqr(pVector->z));
 }
 
-double CSGP4_SDP4::Dot (VECTOR v1, VECTOR v2)
+double CSGP4_SDP4::Dot(VECTOR v1, VECTOR v2)
 {
 	double fRet;
 	fRet = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 	return fRet;
 }
 //////////////// End of conversion of Math - PASCAL routines ////////////////////
-double CSGP4_SDP4::VecDot( double *X, double *Y, int N)
+double CSGP4_SDP4::VecDot(double* X, double* Y, int N)
 {
- /* Purpose 
-	calculate the dot (inner) product of X && Y
-    Inputs
-	X, Y are the input vectors of length N
- */
-  int i;
-  double M;
-  M = 0.0;;
-  for ( i=0; i<N; i++ ) M += X[i] * Y[i];
-  return M;
+	/* Purpose
+	   calculate the dot (inner) product of X && Y
+	   Inputs
+	   X, Y are the input vectors of length N
+	*/
+	int i;
+	double M;
+	M = 0.0;;
+	for (i = 0; i < N; i++) M += X[i] * Y[i];
+	return M;
 }
 /*-----------------------------------------------------------------------*/
-void CSGP4_SDP4::VecCross( double *X, double *Y, double *Z, int N)
+void CSGP4_SDP4::VecCross(double* X, double* Y, double* Z, int N)
 {
-  /*
-    Purpose
-	    calculate the vector cross product z of x && y.
-    Inputs
-	    X && Y of length N
-    Output
-	    Z of length N
-  */
-  int j,k,m;
-  for( m = 0; m < N ; m++ ) {
-    j = (m+1)%N; k = (m+2)%N;
-    Z[m] = X[j] * Y[k] - X[k] * Y[j];
-  }
+	/*
+	  Purpose
+		  calculate the vector cross product z of x && y.
+	  Inputs
+		  X && Y of length N
+	  Output
+		  Z of length N
+	*/
+	int j, k, m;
+	for (m = 0; m < N; m++) {
+		j = (m + 1) % N; k = (m + 2) % N;
+		Z[m] = X[j] * Y[k] - X[k] * Y[j];
+	}
 }
 /*-----------------------------------------------------------------------*/
-double CSGP4_SDP4::VecMag( double *X, int N)
+double CSGP4_SDP4::VecMag(double* X, int N)
 {
-/*  
-   Purpose
-	   calculate the magnitude of the vector X of length N
-   Input 
-	   X
-   returns the magnitude of X
-*/
-   return sqrt( VecDot( X, X, N ));
+	/*
+	   Purpose
+		   calculate the magnitude of the vector X of length N
+	   Input
+		   X
+	   returns the magnitude of X
+	*/
+	return sqrt(VecDot(X, X, N));
 }
 /*------------------------------------------------------------------------*/
-void CSGP4_SDP4::UnitVec( double *X, double *Y, int N )
+void CSGP4_SDP4::UnitVec(double* X, double* Y, int N)
 {
-  /*
-     Purpose
-	     calculate a unit vector in the direction of the input
-	     vector
-     Input 
-	     X, a vector
-	     N  the length of X && Y
-     Output
-	     Y, a unit vector in the direction of X
-  */
-  int i;
-  double M;
+	/*
+	   Purpose
+		   calculate a unit vector in the direction of the input
+		   vector
+	   Input
+		   X, a vector
+		   N  the length of X && Y
+	   Output
+		   Y, a unit vector in the direction of X
+	*/
+	int i;
+	double M;
 
-  M = VecMag( X, N );
-  if (M == 0.0) for (i=0;i<N;i++) Y[i] = 0.0;
-  else          for (i=0;i<N;i++) Y[i] = X[i]/M;
+	M = VecMag(X, N);
+	if (M == 0.0) for (i = 0; i < N; i++) Y[i] = 0.0;
+	else          for (i = 0; i < N; i++) Y[i] = X[i] / M;
 }
 /*-----------------------------------------------------------------------*/
-void CSGP4_SDP4::VecDiff( double *X, double *Y, double *Z, int N)
+void CSGP4_SDP4::VecDiff(double* X, double* Y, double* Z, int N)
 {
-/*  
-   Purpose
-	    Calculate the vector difference of the input vectors
-   Input
-	    X, Y are vectors of length N
-   Output  
-	    Z = X - Y
-*/
-  int i;
-  for (i=0;i<N;i++) Z[i] = X[i] - Y[i];
+	/*
+	   Purpose
+			Calculate the vector difference of the input vectors
+	   Input
+			X, Y are vectors of length N
+	   Output
+			Z = X - Y
+	*/
+	int i;
+	for (i = 0; i < N; i++) Z[i] = X[i] - Y[i];
 }
 /*-----------------------------------------------------------------------*/
-void CSGP4_SDP4::VecSum( double *X, double *Y, double *Z, int N)
+void CSGP4_SDP4::VecSum(double* X, double* Y, double* Z, int N)
 {
-  /* purpose sum of two vectors */
-  /* input X && Y are vectors of length N
-     output Z another vector of length N
-  */
-  int i;
-  for (i=0;i<N;i++) Z[i] = X[i] + Y[i];
+	/* purpose sum of two vectors */
+	/* input X && Y are vectors of length N
+	   output Z another vector of length N
+	*/
+	int i;
+	for (i = 0; i < N; i++) Z[i] = X[i] + Y[i];
 }
 /*-----------------------------------------------------------------------*/
-void CSGP4_SDP4::VecScale( double u, double *X, double *Y, int N)
+void CSGP4_SDP4::VecScale(double u, double* X, double* Y, int N)
 {
-/*
-  Purpose
-	  scale a vector
-  Input
-	  u: a scalar
-	  X: the vector to be scaled 
-	  N: the length of X
-  Output
-	  Y: the scaled vector
-*/
-  int i;
-  for(i=0;i<N;i++)Y[i] = X[i] * u;
+	/*
+	  Purpose
+		  scale a vector
+	  Input
+		  u: a scalar
+		  X: the vector to be scaled
+		  N: the length of X
+	  Output
+		  Y: the scaled vector
+	*/
+	int i;
+	for (i = 0; i < N; i++)Y[i] = X[i] * u;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////Construction area for a CVector class /////////////////////
 //////////////////////////////////////////////////////////////////////////////
-CVector::CVector() 
+CVector::CVector()
 {
 	m_iDepth = 3;
 	m_vector.x = m_vector.y = m_vector.z = m_vector.w = 0.0;
 	return;
 }
 
-CVector::CVector(VECTOR vIn) 
+CVector::CVector(VECTOR vIn)
 {
 	m_iDepth = 3;
 	SetVector(vIn);
 	return;
 }
 
-CVector::~CVector () 
+CVector::~CVector()
 {
 	return;
 }
@@ -266,42 +265,42 @@ void CVector::SetDepth(int iDepth)
 	m_iDepth = iDepth;
 }
 
-double CVector::Dot( VECTOR vIn )
+double CVector::Dot(VECTOR vIn)
 {
- /* Purpose 
-	calculate the dot (inner) product of X && Y
-    Inputs
-	X, Y are the input vectors of length m_iDepth
- */
-	double *X = (double *)&m_vector;
-	double *Y = (double *)&vIn;
+	/* Purpose
+	   calculate the dot (inner) product of X && Y
+	   Inputs
+	   X, Y are the input vectors of length m_iDepth
+	*/
+	double* X = (double*)&m_vector;
+	double* Y = (double*)&vIn;
 
 	int i;
 	double M;
-  
+
 	M = 0.0;;
-	for ( i=0; i<m_iDepth; i++ ) M += X[i] * Y[i];
+	for (i = 0; i < m_iDepth; i++) M += X[i] * Y[i];
 	return M;
 }
 /*-----------------------------------------------------------------------*/
-VECTOR CVector::Cross( VECTOR vIn )
+VECTOR CVector::Cross(VECTOR vIn)
 {
-  /*
-    Purpose
-	    calculate the vector cross product z of x && y.
-    Inputs
-	    m_vector && vIn of length m_iDepth
-    Output
-	    Z of length m_iDepth
-  */
+	/*
+	  Purpose
+		  calculate the vector cross product z of x && y.
+	  Inputs
+		  m_vector && vIn of length m_iDepth
+	  Output
+		  Z of length m_iDepth
+	*/
 	static VECTOR vector;
-	double *X = (double *)&m_vector;
-	double *Y = (double *)&vIn;
-	double *Z = (double *)&vector;
-	
-	int j,k,m;
-	for( m = 0; m < m_iDepth ; m++ ) {
-		j = (m+1)%m_iDepth; k = (m+2)%m_iDepth;
+	double* X = (double*)&m_vector;
+	double* Y = (double*)&vIn;
+	double* Z = (double*)&vector;
+
+	int j, k, m;
+	for (m = 0; m < m_iDepth; m++) {
+		j = (m + 1) % m_iDepth; k = (m + 2) % m_iDepth;
 		Z[m] = X[j] * Y[k] - X[k] * Y[j];
 	}
 	return vector;
@@ -309,99 +308,94 @@ VECTOR CVector::Cross( VECTOR vIn )
 /*-----------------------------------------------------------------------*/
 double CVector::Mag()
 {
-/*  
-   Purpose
-	   calculate the magnitude of the vector X of length m_iDepth
-   Input 
-	   X
-   returns the magnitude of X
-*/
-	return sqrt( Dot( m_vector ));
+	/*
+	   Purpose
+		   calculate the magnitude of the vector X of length m_iDepth
+	   Input
+		   X
+	   returns the magnitude of X
+	*/
+	return sqrt(Dot(m_vector));
 }
 /*------------------------------------------------------------------------*/
-VECTOR CVector::Unit( VECTOR vIn )
+VECTOR CVector::Unit(VECTOR vIn)
 {
-  /*
-     Purpose
-	     calculate a unit vector in the direction of the input
-	     vector
-     Input 
-	     X, a vector
-	     m_iDepth  the length of X && Y
-     Output
-	     Y, a unit vector in the direction of X
-  */
+	/*
+	   Purpose
+		   calculate a unit vector in the direction of the input
+		   vector
+	   Input
+		   X, a vector
+		   m_iDepth  the length of X && Y
+	   Output
+		   Y, a unit vector in the direction of X
+	*/
 	static VECTOR vector;
-	double *X = (double *)&m_vector;
-	double *Y = (double *)&vector;
-	
+	double* X = (double*)&m_vector;
+	double* Y = (double*)&vector;
+
 	int i;
 	double M;
 
-	M = Mag( );
-	if (M == 0.0) for (i=0;i<m_iDepth;i++) Y[i] = 0.0;
-	else          for (i=0;i<m_iDepth;i++) Y[i] = X[i]/M;
+	M = Mag();
+	if (M == 0.0) for (i = 0; i < m_iDepth; i++) Y[i] = 0.0;
+	else          for (i = 0; i < m_iDepth; i++) Y[i] = X[i] / M;
 	return vector;
 }
 /*-----------------------------------------------------------------------*/
-VECTOR CVector::Diff( VECTOR vIn )
+VECTOR CVector::Diff(VECTOR vIn)
 {
-/*  
-   Purpose
-	    Calculate the vector difference of the input vectors
-   Input
-	    X, Y are vectors of length m_iDepth
-   Output  
-	    Z = X - Y
-*/
+	/*
+	   Purpose
+			Calculate the vector difference of the input vectors
+	   Input
+			X, Y are vectors of length m_iDepth
+	   Output
+			Z = X - Y
+	*/
 	static VECTOR vector;
-	double *X = (double *)&m_vector;
-	double *Y = (double *)&vIn;
-	double *Z = (double *)&vector;
-	
+	double* X = (double*)&m_vector;
+	double* Y = (double*)&vIn;
+	double* Z = (double*)&vector;
+
 	int i;
-	for (i=0;i<m_iDepth;i++) Z[i] = X[i] - Y[i];
+	for (i = 0; i < m_iDepth; i++) Z[i] = X[i] - Y[i];
 	return vector;
 }
 /*-----------------------------------------------------------------------*/
-VECTOR CVector::Sum( VECTOR vIn )
+VECTOR CVector::Sum(VECTOR vIn)
 {
-  /* purpose sum of two vectors */
-  /* input X && Y are vectors of length m_iDepth
-     output Z another vector of length m_iDepth
-  */
+	/* purpose sum of two vectors */
+	/* input X && Y are vectors of length m_iDepth
+	   output Z another vector of length m_iDepth
+	*/
 	static VECTOR vector;
-	double *X = (double *)&m_vector;
-	double *Y = (double *)&vIn;
-	double *Z = (double *)&vector;
-	
+	double* X = (double*)&m_vector;
+	double* Y = (double*)&vIn;
+	double* Z = (double*)&vector;
+
 	int i;
-	for (i=0;i<m_iDepth;i++) Z[i] = X[i] + Y[i];
+	for (i = 0; i < m_iDepth; i++) Z[i] = X[i] + Y[i];
 	return vector;
 }
 /*-----------------------------------------------------------------------*/
-VECTOR CVector::Scale( double u )
+VECTOR CVector::Scale(double u)
 {
-/*
-  Purpose
-	  scale a vector
-  Input
-	  u: a scalar
-	  X: the vector to be scaled 
-	  m_iDepth: the length of X
-  Output
-	  Y: the scaled vector
-*/
+	/*
+	  Purpose
+		  scale a vector
+	  Input
+		  u: a scalar
+		  X: the vector to be scaled
+		  m_iDepth: the length of X
+	  Output
+		  Y: the scaled vector
+	*/
 	static VECTOR vector;
-	double *X = (double *)&m_vector;
-	double *Y = (double *)&vector;
-	
+	double* X = (double*)&m_vector;
+	double* Y = (double*)&vector;
+
 	int i;
-	for(i=0;i<m_iDepth;i++)Y[i] = X[i] * u;
+	for (i = 0; i < m_iDepth; i++)Y[i] = X[i] * u;
 	return vector;
 }
-
-
-
-
-

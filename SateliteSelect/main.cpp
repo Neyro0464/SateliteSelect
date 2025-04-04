@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <iomanip>
 #include <fstream>
 #include "Sgpsdp.h"
@@ -80,18 +80,18 @@ bool defStationPos(LLAPos* station) {
 //Function to enter station's vision parametres
 bool defStationVision(double& minAzm, double& maxAzm, double& minElv, double& maxElv, int& timeMinObserveSec) {
     std::cout << "Enter vision parameters of the station (minAzm maxAzm minElv maxElv time): ";
-    std::cin >> minAzm >> maxAzm ;
-    if (minAzm < 0 || minAzm > maxAzm || maxAzm >= 360) { 
+    std::cin >> minAzm >> maxAzm;
+    if (minAzm < 0 || minAzm > maxAzm || maxAzm >= 360) {
         std::cout << "ERROR: wrong parameters of station - Azimut";
         return false;
     }
     std::cin >> minElv >> maxElv;
-    if (minElv < 10 || maxElv < minElv || maxElv > 180){     
+    if (minElv < 10 || maxElv < minElv || maxElv > 180) {
         std::cout << "ERROR: wrong parameters of station - Elevation";
         return false;
     }
     std::cin >> timeMinObserveSec;
-    if (timeMinObserveSec < 1) {                           
+    if (timeMinObserveSec < 1) {
         std::cout << "ERROR: wrong parameters of station - time";
         return false;
     }
@@ -106,7 +106,7 @@ VECTOR ConvertLLAtoCoordinate(LLAPos& Object) {
     double x = (6371.0 + Object.Alt) * cos(Object.Lat) * cos(Object.Lon);
     double y = (6371.0 + Object.Alt) * cos(Object.Lat) * sin(Object.Lon);
     double z = (6371.0 + Object.Alt) * sin(Object.Lat);
-    return {x, y, z, 0.0};
+    return { x, y, z, 0.0 };
 }
 
 // Calculate satellite position with class function
@@ -164,7 +164,7 @@ bool VelocityCheck(LLAPos StationLLA, VECTOR Station, std::vector<CSGP4_SDP4>& S
     SatelliteModel.back().SGP(time);
     Satellite_1 = SatellitePos(SatelliteModel.back(), SatelliteLLA, Satellite_1, time);
     Satellite_1 = Transferring(Satellite_1, StationLLA);
-    
+
     double theta = atan(sqrt(pow(Satellite_1.x + 6371.0 - Station.x, 2) + pow(Satellite_1.y - Station.y, 2)) / (Satellite_1.z - Station.z));
     theta = SatelliteModel[0].RadToDeg(theta);
 
@@ -212,7 +212,7 @@ bool IntersectCheck(LLAPos StationLLA_1, VECTOR Satellite_1, double& minAzm, dou
 
     fi = atan(new_y / new_x) + PI; // +PI to normalize lower and upper bounds
     theta = PI / 2 - acos(new_z / sqrt((pow(new_x, 2) + pow(new_y, 2) + pow(new_z, 2)))); // PI/2 to start from the bottom to the top
-    
+
     if (fi <= maxAzm && fi >= minAzm) {
         if (theta <= maxElv && theta >= minElv) {
             return true;
@@ -224,7 +224,7 @@ bool IntersectCheck(LLAPos StationLLA_1, VECTOR Satellite_1, double& minAzm, dou
 
 // checks the intersection of the satellite with the station's visibility cone (+30 sec to +30 min)
 //  Filter satellites that would be in cone of visibility for timeMinObserve(sec)
-double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& minAzm, double& maxAzm, double& minElv, double& maxElv, int& timeMinObserveSec, double &theta, double& fi) { //remake
+double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& minAzm, double& maxAzm, double& minElv, double& maxElv, int& timeMinObserveSec, double& theta, double& fi) { //remake
     auto now = system_clock::now();
     auto now_time_t = system_clock::to_time_t(now);
     auto now_tm = *gmtime(&now_time_t); // Working in UTC time
@@ -247,7 +247,7 @@ double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& min
     bool check1 = 0;
 
     //searching if Satellite will be in vision cone sometime in the time interval
-    while ((check1 == false || tempTm <= lowerTm) && tempTm <= upperTm) { 
+    while ((check1 == false || tempTm <= lowerTm) && tempTm <= upperTm) {
         tempTm = SatelliteModel.JulianDate(temp);
         SatelliteModel.SGP(tempTm);
         Satellite_1 = SatellitePos(SatelliteModel, SatelliteLLA_1, Satellite_1, tempTm);
@@ -258,10 +258,10 @@ double TimeIntersect(CSGP4_SDP4 SatelliteModel, LLAPos StationLLA_1, double& min
     if (tempTm > upperTm || tempTm < lowerTm) {
         return 0;
     }
-    
+
     double tmpfi = fi;
     double tmtheta = theta;
-    
+
     // block for time filter
     // checking if satellite is in vision cone after minTimeObserve
     tm filterTime = temp;
@@ -312,17 +312,17 @@ bool getDiraction(VECTOR Station, CSGP4_SDP4 SatelliteModel) {
 
 
 int main() {
-    std::string filename = "TLE.txt"; 
+    std::string filename = "TLE.txt";
     std::vector<CSGP4_SDP4> SatelliteModel;
     std::vector<Satellite> Objects;
-    
+
 
     double minAzm = 0, maxAzm = 0, minElv = 0, maxElv = 0;  // parameters of the station vision area
     int timeMinObserveSec = 0; // the time during which the satellite must be in the zone
 
     // station data preparation (start)
     LLAPos StationLLA_1;
-    VECTOR Station_1{0.0, 0.0, 0.0, 0.0};
+    VECTOR Station_1{ 0.0, 0.0, 0.0, 0.0 };
 
     if (!defStationPos(&StationLLA_1)) {
         return 0;
@@ -341,10 +341,10 @@ int main() {
     maxAzm = SatelliteModel[0].DegToRad(maxAzm);
     minElv = SatelliteModel[0].DegToRad(minElv);
     maxElv = SatelliteModel[0].DegToRad(maxElv);
-    
+
     std::cout << minElv << " " << maxElv << "\t" << minAzm << " " << maxAzm << endl;
     // station data preparation (end)
-    
+
 
     SatelliteFilter(filename, StationLLA_1, Station_1, SatelliteModel);    // pre-filter by satellite speed
 
@@ -356,10 +356,10 @@ int main() {
 
     for (int i = 0; i < N; i++) {
         satNumer = SatelliteModel[i].GetNORAD();
-        SATELLITE* s = (SATELLITE*)SatelliteModel[i].GetSatellite(); 
+        SATELLITE* s = (SATELLITE*)SatelliteModel[i].GetSatellite();
         time = TimeIntersect(SatelliteModel[i], StationLLA_1, minAzm, maxAzm, minElv, maxElv, timeMinObserveSec, theta, fi);
         if (time != 0) {
-            bool dir = getDiraction(Station_1, SatelliteModel[i]); 
+            bool dir = getDiraction(Station_1, SatelliteModel[i]);
             SatelliteModel[i].SGP(time);
             SatelliteModel[i].CalculateLatLonAlt(time);
             double Lat = SatelliteModel[i].GetLat();
@@ -367,14 +367,14 @@ int main() {
             double Alt = SatelliteModel[i].GetAlt();
             fi = SatelliteModel[i].RadToDeg(fi);
             theta = SatelliteModel[i].RadToDeg(theta);
-            Objects.push_back({ s->cSatelliteName, satNumer, fi, theta, Lat, Lon, Alt, SatelliteModel[i].CalendarDate(time), SatelliteModel[i].GetVel().w, dir, time});
+            Objects.push_back({ s->cSatelliteName, satNumer, fi, theta, Lat, Lon, Alt, SatelliteModel[i].CalendarDate(time), SatelliteModel[i].GetVel().w, dir, time });
         }
 
 
     }
 
     std::sort(Objects.begin(), Objects.end(), [](const Satellite& a, const Satellite& b)
-        {return a.timeStamp < b.timeStamp;}
+        {return a.timeStamp < b.timeStamp; }
     );
 
     std::cout << "Name" << "\t\t\t|" << "# Number" << "\t|" << "AZM   |" << "ELV  |" << "Lat   | " << "Lon    |" << "Alt    | " << "Velocity km/s\t | " << "Direction | " << "DD/MM/YYYY\thh:mm:ss" << std::endl;

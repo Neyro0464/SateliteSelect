@@ -1,12 +1,19 @@
+#ifndef SGPSDP_H
+#define SGPSDP_H
+
+#include <iostream>
+#include<cstring>
+#include <string>
 #include <stdio.h>
 #include <ctime>
 #include <time.h>
 #include <chrono>
+#include <cmath> 
 
 //* Already defined in  >stdafx.h<
 typedef struct tagVECTOR {
     double x, y, z, w;
-} VECTOR;
+}VECTOR;
 
 typedef struct tagSATELLITE {
     char    cSatelliteName[23];
@@ -33,7 +40,7 @@ typedef struct tagSATELLITE {
     double  fMeanMotion;
     int     iRevAtEpoch;
     double  fJulianEpoch;
-} SATELLITE;
+}SATELLITE;
 
 #ifndef PI
 #define PI 3.141592653589793
@@ -146,12 +153,9 @@ public:
     VECTOR      GetUserVel();
     VECTOR      GetObserver();
     VECTOR      GetRADec();
-    bool        GetEclipsed();
     void* GetSatellite();
     int         GetNORAD();
 
-    VECTOR      CalculateSolarPosition(double time);
-    double      DepthOfEclipse(double time, VECTOR r1);
     double      VecDot(double* X, double* Y, int N);
     void        VecCross(double* X, double* Y, double* Z, int N);
     double      VecMag(double* X, int N);
@@ -160,3 +164,6 @@ public:
     void        VecSum(double* X, double* Y, double* Z, int N);
     void        VecScale(double u, double* X, double* Y, int N);
 };
+
+
+#endif //SGPSDP_H

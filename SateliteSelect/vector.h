@@ -1,3 +1,6 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h> 
@@ -5,15 +8,6 @@
 #include <float.h> 
 #include <errno.h> 
 
-//#ifdef __cplusplus
-//extern "C" 
-//#endif
-
-/* Already defined in  >stdafx.h<
-typedef struct	tagVECTOR	{ 
-	double x,y,z,w;
-} VECTOR;
-*/
 #define M_PI PI
 #define M2PI (2 * M_PI)
 #define RTD (360 / M2PI)
@@ -44,30 +38,30 @@ typedef struct	tagVECTOR	{
 class CVector
 {
 public:
-	CVector		();
-	CVector		(VECTOR vIn);
-	~CVector	();
+	CVector();
+	CVector(VECTOR vIn);
+	~CVector();
 public:
-	VECTOR 	GetVector	();
-	void 	SetVector	(VECTOR vIn);
-	int		GetDepth	();
-	void 	SetDepth	(int iDepth);
- 
+	VECTOR 	GetVector();
+	void 	SetVector(VECTOR vIn);
+	int		GetDepth();
+	void 	SetDepth(int iDepth);
 
 
-	double 	Dot		( VECTOR vIn );
-	VECTOR	Cross	( VECTOR vIn );
-	double 	Mag		( );
-	VECTOR 	Unit	( VECTOR vIn );
-	VECTOR	Diff	( VECTOR vIn );
-	VECTOR 	Sum		( VECTOR vIn );
-	VECTOR 	Scale	( double u );
-//	void 	ToSphere( double *X, double *az, double *el, double *range );
+
+	double 	Dot(VECTOR vIn);
+	VECTOR	Cross(VECTOR vIn);
+	double 	Mag();
+	VECTOR 	Unit(VECTOR vIn);
+	VECTOR	Diff(VECTOR vIn);
+	VECTOR 	Sum(VECTOR vIn);
+	VECTOR 	Scale(double u);
+	//	void 	ToSphere( double *X, double *az, double *el, double *range );
 protected:
 	int 	m_iDepth;
 	VECTOR	m_vector;
 
 };
 
-
+#endif //VECTOR_H
 
