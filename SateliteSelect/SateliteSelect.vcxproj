@@ -129,19 +129,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Astro.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="observer.cpp" />
+    <ClCompile Include="Satselect.cpp" />
     <ClCompile Include="Sgpsdp.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="time.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="CMakeLists.txt" />
     <Text Include="TLE.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Satselect.h" />
     <ClInclude Include="Sgpsdp.h" />
-    <ClInclude Include="vector.h" />
+    <ClInclude Include="myVector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
