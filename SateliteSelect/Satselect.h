@@ -70,7 +70,7 @@ namespace Sgpsdp {
 		bool VelocityCheck(Station station, CSGP4_SDP4 SatelliteModel);
 		bool IntersectCheck(CoordDecart& Satellite_1, Station station, double& theta, double& fi);
 		bool getDiraction(Station station, CSGP4_SDP4& SatelliteModel);
-		double TimeIntersect(CSGP4_SDP4& SatelliteModel, Station& station, double& theta, double& fi);
+		double TimeIntersect(CSGP4_SDP4& SatelliteModel, Station& station, double& theta, double& fi, tm temp, tm upperTime, tm lowerTime);
 		CoordDecart SatellitePos(CSGP4_SDP4 SGP, CoordGeodetic& SatelliteLLA_1, CoordDecart Satellite_1, double time);
 		void dataPrepare();
 

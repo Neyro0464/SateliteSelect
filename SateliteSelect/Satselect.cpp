@@ -283,17 +283,17 @@ bool SetelliteSelect::IntersectCheck(CoordDecart& Satellite_1, Station station, 
 
 // checks the intersection of the satellite with the station's visibility cone (+30 sec to +30 min)
 //  Filter satellites that would be in cone of visibility for timeMinObserve(sec)
-double SetelliteSelect::TimeIntersect(CSGP4_SDP4& SatelliteModel, Station& station, double& theta, double& fi) { //remake
-    auto now = system_clock::now();
-    auto now_time_t = system_clock::to_time_t(now);
-    auto now_tm = *gmtime(&now_time_t); // Working in UTC time
-    tm lowerTime = now_tm;  // lower bound of time (current time + 30 sec)
-    lowerTime.tm_sec += 30;
+double SetelliteSelect::TimeIntersect(CSGP4_SDP4& SatelliteModel, Station& station, double& theta, double& fi, tm temp, tm upperTime, tm lowerTime) { //remake
+    //auto now = system_clock::now();
+    //auto now_time_t = system_clock::to_time_t(now);
+    //auto now_tm = *gmtime(&now_time_t); // Working in UTC time
+    //tm lowerTime = now_tm;  // lower bound of time (current time + 30 sec)
+    //lowerTime.tm_sec += 30;
 
-    tm temp = now_tm;       // time that we shift to find required time (current time)
+    //tm temp = now_tm;       // time that we shift to find required time (current time)
 
-    tm upperTime = now_tm;  // upper bound of time (current time + 30 min)
-    upperTime.tm_min += 30;
+    //tm upperTime = now_tm;  // upper bound of time (current time + 30 min)
+    //upperTime.tm_min += 30;
 
 
     double lowerTm = SatelliteModel.JulianDate(lowerTime); // lower bound of time interval
@@ -381,8 +381,17 @@ const std::vector<NORAD_DATA> SetelliteSelect::GetSatArray() {
     std::stringstream onTime1;
     tm timeDate;
     bool dir = 0;
+
+    auto now = system_clock::now();
+    auto now_time_t = system_clock::to_time_t(now);
+    auto now_tm = *gmtime(&now_time_t); // Working in UTC time
+    tm lowerTime = now_tm;  // lower bound of time (current time + 30 sec)
+    lowerTime.tm_sec += 30;
+    tm temp = now_tm;       // time that we shift to find required time (current time)
+    tm upperTime = now_tm;  // upper bound of time (current time + 30 min)
+    upperTime.tm_min += 30;
     for (int i = 0; i < N; i++) {
-        time = TimeIntersect(Satellites[i], stationtmp, theta, fi);
+        time = TimeIntersect(Satellites[i], stationtmp, theta, fi, temp, upperTime, lowerTime);
         if (time != 0) {
             NORAD_DATA dummy{};
             dummy.noradNumber = Satellites[i].GetNORAD();
